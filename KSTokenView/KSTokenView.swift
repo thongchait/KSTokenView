@@ -875,11 +875,21 @@ extension KSTokenView : UITextFieldDelegate {
       // Check if character is removed at some index
       // Remove character at that index
       if (string.isEmpty) {
-         let first: String = olderText!.substring(to: olderText!.characters.index(olderText!.startIndex, offsetBy: range.location)) as String
-         let second: String = olderText!.substring(from: olderText!.characters.index(olderText!.startIndex, offsetBy: range.location+1)) as String
-         searchString = first + second
-         searchString = searchString.trimmingCharacters(in: CharacterSet.whitespaces)
-         
+        
+        // Thai language issue
+        if olderText!.characters.count <= range.location {
+            let diff = range.location - olderText!.characters.count
+            let first: String = olderText!.substring(to: olderText!.characters.index(olderText!.startIndex, offsetBy: range.location - ( 1 + diff ))) as String
+            let second: String = olderText!.substring(from: olderText!.characters.index(olderText!.startIndex, offsetBy: ( range.location - diff ))) as String
+            searchString = first + second
+        }
+        else {
+            let first: String = olderText!.substring(to: olderText!.characters.index(olderText!.startIndex, offsetBy: range.location)) as String
+            let second: String = olderText!.substring(from: olderText!.characters.index(olderText!.startIndex, offsetBy: range.location + 1)) as String
+            searchString = first + second
+        }
+        searchString = searchString.trimmingCharacters(in: CharacterSet.whitespaces)
+        
       } else { // new character added
          if (tokenizingCharacters.contains(string) && olderText != KSTextEmpty && olderTextTrimmed != "") {
             addTokenWithTitle(olderTextTrimmed, tokenObject: nil)
